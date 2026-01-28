@@ -678,8 +678,11 @@ export default function LoveWhisperWall() {
                   : "bg-[#FFE4EC] text-gray-400 cursor-not-allowed"
               )}
             >
-              <Send className="w-3 h-3 sm:w-4 sm:h-4" />
-              <span>{isSubmitting ? "전송 중..." : "전송하기"}</span>
+              {isSubmitting ? (
+                <Send className="w-4 h-4 sendFly" />
+              ) : (
+                <span>❤️</span>
+              )}
             </button>
           </form>
         </div>
