@@ -2,11 +2,11 @@
 
 import React from "react"
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Heart, Send } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { db } from "@/lib/firebase";
-import { collection, addDoc, query, orderBy, onSnapshot, Timestamp, limit } from "firebase/firestore";
+import { collection, addDoc, query, orderBy, onSnapshot, Timestamp, limit, where } from "firebase/firestore";
 
 interface Message {
   id: string;
@@ -16,16 +16,29 @@ interface Message {
   createdAt?: Timestamp;
 }
 
-// Pre-calculated positions for each bubble
-const bubblePositions = [
-  { x: 5, y: 8, size: "sm" }, { x: 22, y: 12, size: "md" }, { x: 42, y: 6, size: "lg" },
-  { x: 62, y: 14, size: "sm" }, { x: 82, y: 10, size: "md" }, { x: 10, y: 28, size: "lg" },
-  { x: 28, y: 32, size: "sm" }, { x: 50, y: 26, size: "md" }, { x: 70, y: 30, size: "lg" },
-  { x: 88, y: 24, size: "sm" }, { x: 8, y: 48, size: "md" }, { x: 25, y: 52, size: "lg" },
-  { x: 45, y: 46, size: "sm" }, { x: 65, y: 50, size: "md" }, { x: 85, y: 44, size: "lg" },
-  { x: 12, y: 68, size: "sm" }, { x: 32, y: 72, size: "md" }, { x: 52, y: 66, size: "lg" },
-  { x: 72, y: 70, size: "sm" }, { x: 90, y: 64, size: "md" },
-] as const;
+// 하트 구름 위치 생성 함수 (동적으로 생성)
+const generateBubblePositions = (count: number) => {
+  const positions = [];
+  const sizes: Array<"sm" | "md" | "lg"> = ["sm", "md", "lg"];
+  
+  for (let i = 0; i < count; i++) {
+    // 화면 전체에 고르게 분산되도록 위치 생성
+    const x = (i * 23 + Math.random() * 10) % 95; // 0-95% 사이
+    const y = (i * 17 + Math.random() * 15) % 85; // 0-85% 사이
+    const size = sizes[i % sizes.length];
+    
+    positions.push({
+      x: Math.max(2, Math.min(93, x)), // 2-93% 사이로 제한
+      y: Math.max(5, Math.min(80, y)), // 5-80% 사이로 제한
+      size,
+    });
+  }
+  
+  return positions;
+};
+
+// 기본 위치 (최대 20개)
+const defaultBubblePositions = generateBubblePositions(20);
 
 const sizeConfig = {
   sm: { width: 100, height: 90, fontSize: "text-[10px]" },
@@ -108,25 +121,45 @@ export default function LoveWhisperWall() {
   const maxLength = 80;
   const charCount = message.length;
 
-  // Firestore에서 실시간으로 메시지 불러오기
+  // Firestore에서 실시간으로 메시지 불러오기 (만료되지 않은 메시지만)
   useEffect(() => {
     const messagesRef = collection(db, "messages");
-    const q = query(messagesRef, orderBy("createdAt", "desc"), limit(20));
+    const now = Timestamp.now();
+    
+    // 만료되지 않은 메시지만 가져오기 (최대 100개까지 가져온 후 랜덤 선택)
+    const q = query(
+      messagesRef,
+      where("expiresAt", ">", now),
+      orderBy("expiresAt", "asc"), // 만료 시간 순으로 정렬
+      limit(100) // 충분히 많이 가져온 후 랜덤 선택
+    );
     
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const messagesData: Message[] = snapshot.docs.map((doc) => ({
+      const allMessages: Message[] = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       })) as Message[];
       
-      // 최신 메시지가 위로 오도록 역순으로 정렬 (화면 표시용)
-      setMessages(messagesData.reverse());
+      // 랜덤으로 최대 20개 선택
+      const shuffled = [...allMessages].sort(() => Math.random() - 0.5);
+      const selectedMessages = shuffled.slice(0, 20);
+      
+      setMessages(selectedMessages);
     }, (error) => {
       console.error("메시지 불러오기 실패:", error);
     });
 
     return () => unsubscribe();
   }, []);
+
+  // 표시할 메시지와 위치 매핑
+  const displayedMessages = useMemo(() => {
+    return messages.slice(0, 20).map((msg, index) => ({
+      message: msg,
+      position: defaultBubblePositions[index] || defaultBubblePositions[index % defaultBubblePositions.length],
+      index,
+    }));
+  }, [messages]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -187,8 +220,8 @@ export default function LoveWhisperWall() {
 
       {/* Heart Bubbles */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-10">
-        {messages.slice(0, 20).map((msg, i) => (
-          <HeartBubble key={msg.id} msg={msg} pos={bubblePositions[i]} index={i} />
+        {displayedMessages.map(({ message: msg, position: pos, index: i }) => (
+          <HeartBubble key={msg.id} msg={msg} pos={pos} index={i} />
         ))}
       </div>
 
