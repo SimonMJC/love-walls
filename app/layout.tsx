@@ -8,9 +8,27 @@ const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'Love Whisper Wall | 사랑의 대나무숲',
-  description: '사랑하는 모든 존재에게 보내는 한 줄 고백들',
+  title: 'Love Walls',
+  description: '사랑의 한 마디를 남겨주세요❤️',
   generator: 'v0.app',
+  openGraph: {
+    title: 'Love Walls',
+    description: '사랑의 한 마디를 남겨주세요❤️',
+    images: [
+      {
+        url: '/heart-header.svg',
+        width: 512,
+        height: 512,
+        alt: 'Love Walls heart',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Love Walls',
+    description: '사랑의 한 마디를 남겨주세요❤️',
+    images: ['/heart-header.svg'],
+  },
   icons: {
     icon: [
       {
