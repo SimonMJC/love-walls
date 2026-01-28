@@ -1,0 +1,10 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // TODO: 서비스 정책에 맞게 보안 규칙을 강화하세요.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+
