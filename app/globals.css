@@ -158,6 +158,18 @@
   }
 }
 
+/* Enter once and stay visible (no fade-out) */
+@keyframes bubbleEnter {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
 @keyframes gentleFloat {
   0%, 100% {
     transform: translate(0, 0) rotate(0deg);
@@ -194,5 +206,40 @@
   }
   50% {
     transform: scale(1.03);
+  }
+}
+
+/* Neon-sign style marquee for long texts */
+@keyframes marqueeLeft {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.marqueeMask {
+  overflow: hidden;
+  white-space: nowrap;
+  /* soften edges like neon sign */
+  -webkit-mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
+  mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
+}
+
+.marqueeText {
+  display: inline-block;
+  white-space: nowrap;
+  will-change: transform;
+  animation-name: marqueeLeft;
+  animation-duration: var(--marquee-duration, 8s);
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marqueeText {
+    animation: none;
+    transform: none;
   }
 }
