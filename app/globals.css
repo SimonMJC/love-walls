@@ -173,6 +173,21 @@
   }
 }
 
+@keyframes gentleDrift {
+  0%, 100% {
+    transform: translate(0, 0);
+  }
+  25% {
+    transform: translate(var(--move-x, 0px), var(--move-y, 0px));
+  }
+  50% {
+    transform: translate(calc(var(--move-x, 0px) * 1.5), calc(var(--move-y, 0px) * 1.5));
+  }
+  75% {
+    transform: translate(var(--move-x, 0px), var(--move-y, 0px));
+  }
+}
+
 @keyframes pulseSoft {
   0%, 100% {
     transform: scale(1);

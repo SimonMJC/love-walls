@@ -33,12 +33,40 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.helloWorld = void 0;
-const functions = __importStar(require("firebase-functions"));
+exports.helloWorld = exports.deleteExpiredMessages = void 0;
+const https_1 = require("firebase-functions/v2/https");
+const scheduler_1 = require("firebase-functions/v2/scheduler");
 const admin = __importStar(require("firebase-admin"));
 admin.initializeApp();
 const db = admin.firestore();
-exports.helloWorld = functions.https.onRequest(async (req, res) => {
+// 24시간이 지난 메시지 자동 삭제 스케줄러
+// 매 시간마다 실행되어 만료된 메시지를 삭제합니다
+exports.deleteExpiredMessages = (0, scheduler_1.onSchedule)("every 1 hours", async () => {
+    const now = admin.firestore.Timestamp.now();
+    try {
+        // expiresAt이 현재 시간보다 이전인 문서들을 찾아서 삭제
+        const expiredMessages = await db
+            .collection("messages")
+            .where("expiresAt", "<=", now)
+            .get();
+        if (expiredMessages.empty) {
+            console.log("삭제할 만료된 메시지가 없습니다.");
+            return;
+        }
+        const batch = db.batch();
+        expiredMessages.docs.forEach((doc) => {
+            batch.delete(doc.ref);
+        });
+        await batch.commit();
+        console.log(`${expiredMessages.size}개의 만료된 메시지가 삭제되었습니다.`);
+        return;
+    }
+    catch (error) {
+        console.error("만료된 메시지 삭제 중 오류 발생:", error);
+        throw error;
+    }
+});
+exports.helloWorld = (0, https_1.onRequest)(async (req, res) => {
     await db.collection("logs").add({
         message: "Hello from love-walls!",
         createdAt: admin.firestore.FieldValue.serverTimestamp(),

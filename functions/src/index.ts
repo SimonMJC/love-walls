@@ -1,4 +1,5 @@
-import * as functions from "firebase-functions"
+import { onRequest } from "firebase-functions/v2/https"
+import { onSchedule } from "firebase-functions/v2/scheduler"
 import * as admin from "firebase-admin"
 
 admin.initializeApp()
@@ -7,9 +8,7 @@ const db = admin.firestore()
 
 // 24시간이 지난 메시지 자동 삭제 스케줄러
 // 매 시간마다 실행되어 만료된 메시지를 삭제합니다
-export const deleteExpiredMessages = functions.pubsub
-  .schedule("every 1 hours")
-  .onRun(async (context) => {
+export const deleteExpiredMessages = onSchedule("every 1 hours", async () => {
     const now = admin.firestore.Timestamp.now()
     
     try {
@@ -21,7 +20,7 @@ export const deleteExpiredMessages = functions.pubsub
 
       if (expiredMessages.empty) {
         console.log("삭제할 만료된 메시지가 없습니다.")
-        return null
+        return
       }
 
       const batch = db.batch()
@@ -31,15 +30,14 @@ export const deleteExpiredMessages = functions.pubsub
 
       await batch.commit()
       console.log(`${expiredMessages.size}개의 만료된 메시지가 삭제되었습니다.`)
-      
-      return null
+      return
     } catch (error) {
       console.error("만료된 메시지 삭제 중 오류 발생:", error)
       throw error
     }
-  })
+})
 
-export const helloWorld = functions.https.onRequest(async (req, res) => {
+export const helloWorld = onRequest(async (req, res) => {
   await db.collection("logs").add({
     message: "Hello from love-walls!",
     createdAt: admin.firestore.FieldValue.serverTimestamp(),
