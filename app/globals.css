@@ -243,3 +243,30 @@
     transform: none;
   }
 }
+
+/* Cute heart shake */
+@keyframes heartWiggle {
+  0%   { transform: rotate(0deg) scale(1); }
+  15%  { transform: rotate(-10deg) scale(1.05); }
+  30%  { transform: rotate(10deg) scale(1.05); }
+  45%  { transform: rotate(-8deg) scale(1.04); }
+  60%  { transform: rotate(8deg) scale(1.04); }
+  75%  { transform: rotate(-4deg) scale(1.02); }
+  100% { transform: rotate(0deg) scale(1); }
+}
+
+.heartWiggle {
+  transform-origin: center;
+  animation: heartWiggle 520ms ease-in-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .heartWiggle {
+    animation: none;
+  }
+}
+
+/* Remove mobile tap highlight “oval” */
+.noTapHighlight {
+  -webkit-tap-highlight-color: transparent;
+}

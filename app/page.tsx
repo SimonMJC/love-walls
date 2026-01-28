@@ -270,6 +270,7 @@ export default function LoveWhisperWall() {
   const avoidRectRef = useRef<AvoidRect>(DEFAULT_AVOID_RECT)
   const bubblePosByIdRef = useRef<Map<string, BubblePos>>(new Map())
   const [animTick, setAnimTick] = useState(0)
+  const [heartWiggleKey, setHeartWiggleKey] = useState(0)
   const [nickname, setNickname] = useState("");
   const [recipient, setRecipient] = useState("");
   const [message, setMessage] = useState("");
@@ -568,11 +569,30 @@ export default function LoveWhisperWall() {
 
             {/* Right-aligned heart icon */}
             <div className="flex items-center justify-end">
-              <Heart className="w-5 h-5 text-[#FF9FBF] fill-[#FF9FBF]" />
+              <button
+                type="button"
+                aria-label="하트 흔들기"
+                className="p-1 -m-1 rounded-full noTapHighlight focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFE4EC]"
+                onClick={() => setHeartWiggleKey((k) => k + 1)}
+              >
+                <span key={heartWiggleKey} className="inline-block heartWiggle">
+                  <Heart className="w-5 h-5 text-[#FF9FBF] fill-[#FF9FBF]" />
+                </span>
+              </button>
             </div>
           </div>
         </div>
       </header>
+
+      {/* Footer */}
+      <footer className="fixed bottom-0 left-0 right-0 z-30 pointer-events-none">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 pb-4">
+          <div className="text-center text-[11px] text-gray-400 space-y-1">
+            <div>© 2026 Love Walls. All rights reserved.</div>
+            <div>E-Mail: simon@uniquesun.art</div>
+          </div>
+        </div>
+      </footer>
 
       {/* Background Gradient */}
       <div className="fixed inset-0 bg-gradient-to-br from-[#FFF8FA] via-white to-[#FFF0F5] z-0" />
