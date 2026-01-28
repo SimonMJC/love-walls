@@ -589,7 +589,7 @@ export default function LoveWhisperWall() {
       >
         <div className="bg-white/95 backdrop-blur-sm border border-[#FFD6E4] rounded-full px-6 py-3 shadow-lg flex items-center gap-2">
           <Heart className="w-4 h-4 text-[#FF9FBF] fill-[#FF9FBF]" />
-          <span className="text-gray-600 text-sm">당신의 사랑이 대나무숲에 전달되었어요</span>
+          <span className="text-gray-600 text-sm">당신의 사랑이 전달되었어요 😘</span>
         </div>
       </div>
 
@@ -610,7 +610,7 @@ export default function LoveWhisperWall() {
                 type="text"
                 value={nickname}
                 onChange={(e) => setNickname(e.target.value)}
-                placeholder="고라니"
+                placeholder="닉네임"
                 className="w-full px-3 py-2 sm:px-4 sm:py-2.5 bg-[#FFF8FA] border border-[#FFE4EC] rounded-xl text-gray-700 placeholder-gray-400 focus:outline-none focus:border-[#FFB8D0] focus:ring-2 focus:ring-[#FFE4EC] transition-all text-xs sm:text-sm"
               />
               <span className="text-[9px] sm:text-[10px] text-gray-400 ml-2">닉네임 (선택)</span>
@@ -620,7 +620,7 @@ export default function LoveWhisperWall() {
                 type="text"
                 value={recipient}
                 onChange={(e) => setRecipient(e.target.value)}
-                placeholder="친구에게, 우리 강아지에게..."
+                placeholder="예: 친구에게, 우리 강아지에게..."
                 className="w-full px-3 py-2 sm:px-4 sm:py-2.5 bg-[#FFF8FA] border border-[#FFE4EC] rounded-xl text-gray-700 placeholder-gray-400 focus:outline-none focus:border-[#FFB8D0] focus:ring-2 focus:ring-[#FFE4EC] transition-all text-xs sm:text-sm"
               />
               <span className="text-[9px] sm:text-[10px] text-gray-400 ml-2">누구에게 (선택)</span>
