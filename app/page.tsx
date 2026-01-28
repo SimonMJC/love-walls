@@ -551,9 +551,12 @@ export default function LoveWhisperWall() {
     <div className="min-h-screen bg-white relative overflow-hidden">
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-white/70 backdrop-blur-md border-b border-[#FFE4EC]">
-        <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 flex items-center justify-center">
-          <div className="flex items-center gap-2">
-            <Heart className="w-5 h-5 text-[#FF9FBF] fill-[#FF9FBF]" />
+        <div className="max-w-7xl mx-auto px-4 md:px-6 pt-3 pb-4 md:pt-4 md:pb-5">
+          <div className="grid grid-cols-3 items-center">
+            {/* Left spacer (keeps center perfectly centered) */}
+            <div />
+
+            {/* Centered title/subtitle */}
             <div className="flex flex-col items-center text-center leading-tight">
               <h1 className="text-base md:text-lg font-semibold text-gray-700">
                 Love Walls
@@ -561,6 +564,11 @@ export default function LoveWhisperWall() {
               <p className="text-[10px] md:text-xs text-gray-500">
                 사랑의 한 마디를 남겨주세요
               </p>
+            </div>
+
+            {/* Right-aligned heart icon */}
+            <div className="flex items-center justify-end">
+              <Heart className="w-5 h-5 text-[#FF9FBF] fill-[#FF9FBF]" />
             </div>
           </div>
         </div>
