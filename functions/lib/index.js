@@ -33,8 +33,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.helloWorld = exports.deleteExpiredMessages = void 0;
-const https_1 = require("firebase-functions/v2/https");
+exports.deleteExpiredMessages = void 0;
 const scheduler_1 = require("firebase-functions/v2/scheduler");
 const admin = __importStar(require("firebase-admin"));
 admin.initializeApp();
@@ -65,12 +64,5 @@ exports.deleteExpiredMessages = (0, scheduler_1.onSchedule)("every 1 hours", asy
         console.error("만료된 메시지 삭제 중 오류 발생:", error);
         throw error;
     }
-});
-exports.helloWorld = (0, https_1.onRequest)(async (req, res) => {
-    await db.collection("logs").add({
-        message: "Hello from love-walls!",
-        createdAt: admin.firestore.FieldValue.serverTimestamp(),
-    });
-    res.send("Hello from love-walls!");
 });
 //# sourceMappingURL=index.js.map

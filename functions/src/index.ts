@@ -1,4 +1,3 @@
-import { onRequest } from "firebase-functions/v2/https"
 import { onSchedule } from "firebase-functions/v2/scheduler"
 import * as admin from "firebase-admin"
 
@@ -36,13 +35,3 @@ export const deleteExpiredMessages = onSchedule("every 1 hours", async () => {
       throw error
     }
 })
-
-export const helloWorld = onRequest(async (req, res) => {
-  await db.collection("logs").add({
-    message: "Hello from love-walls!",
-    createdAt: admin.firestore.FieldValue.serverTimestamp(),
-  })
-
-  res.send("Hello from love-walls!")
-})
-
