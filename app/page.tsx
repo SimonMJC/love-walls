@@ -558,8 +558,8 @@ export default function LoveWhisperWall() {
               <h1 className="text-base md:text-lg font-semibold text-gray-700">
                 Love Walls
               </h1>
-              <p className="text-[11px] md:text-xs text-gray-500">
-                사랑하는 모든 존재에게 보내는 한 마디
+              <p className="text-[10px] md:text-xs text-gray-500">
+                사랑의 한 마디를 남겨주세요
               </p>
             </div>
           </div>
