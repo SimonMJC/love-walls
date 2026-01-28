@@ -2,39 +2,19 @@
 
 import React from "react"
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Heart, Send } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { db } from "@/lib/firebase";
+import { collection, addDoc, query, orderBy, onSnapshot, Timestamp, limit } from "firebase/firestore";
 
 interface Message {
   id: string;
   nickname?: string;
   recipient?: string;
   message: string;
+  createdAt?: Timestamp;
 }
-
-const dummyMessages: Message[] = [
-  { id: "1", message: "사랑해" },
-  { id: "2", nickname: "익명", recipient: "엄마에게", message: "항상 고마워요" },
-  { id: "3", message: "보고 싶어" },
-  { id: "4", recipient: "너에게", message: "널 좋아해" },
-  { id: "5", nickname: "별님", message: "오늘도 수고했어" },
-  { id: "6", message: "행복해" },
-  { id: "7", recipient: "우리 강아지에게", message: "사랑해 뽀삐야" },
-  { id: "8", message: "고마워" },
-  { id: "9", nickname: "햇살", recipient: "아빠에게", message: "건강하세요" },
-  { id: "10", message: "응원해" },
-  { id: "11", message: "잘 될 거야" },
-  { id: "12", recipient: "친구에게", message: "고마워 친구야" },
-  { id: "13", message: "많이 좋아해" },
-  { id: "14", nickname: "구름", message: "힘내요" },
-  { id: "15", message: "보고파" },
-  { id: "16", recipient: "할머니에게", message: "오래오래 건강하세요" },
-  { id: "17", message: "최고야" },
-  { id: "18", nickname: "달빛", message: "잘 자" },
-  { id: "19", message: "사랑합니다" },
-  { id: "20", recipient: "나에게", message: "잘하고 있어" },
-];
 
 // Pre-calculated positions for each bubble
 const bubblePositions = [
@@ -118,23 +98,66 @@ function HeartBubble({ msg, pos, index }: { msg: Message; pos: typeof bubblePosi
 }
 
 export default function LoveWhisperWall() {
-  const [messages] = useState<Message[]>(dummyMessages);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [nickname, setNickname] = useState("");
   const [recipient, setRecipient] = useState("");
   const [message, setMessage] = useState("");
   const [showToast, setShowToast] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const maxLength = 80;
   const charCount = message.length;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Firestore에서 실시간으로 메시지 불러오기
+  useEffect(() => {
+    const messagesRef = collection(db, "messages");
+    const q = query(messagesRef, orderBy("createdAt", "desc"), limit(20));
+    
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const messagesData: Message[] = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as Message[];
+      
+      // 최신 메시지가 위로 오도록 역순으로 정렬 (화면 표시용)
+      setMessages(messagesData.reverse());
+    }, (error) => {
+      console.error("메시지 불러오기 실패:", error);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!message.trim()) return;
-    setNickname("");
-    setRecipient("");
-    setMessage("");
-    setShowToast(true);
-    setTimeout(() => setShowToast(false), 3000);
+    if (!message.trim() || isSubmitting) return;
+
+    setIsSubmitting(true);
+    
+    try {
+      const now = Timestamp.now();
+      const expiresAt = Timestamp.fromMillis(now.toMillis() + 24 * 60 * 60 * 1000); // 24시간 후
+
+      await addDoc(collection(db, "messages"), {
+        message: message.trim(),
+        nickname: nickname.trim() || undefined,
+        recipient: recipient.trim() || undefined,
+        createdAt: now,
+        expiresAt: expiresAt,
+      });
+
+      // 폼 초기화
+      setNickname("");
+      setRecipient("");
+      setMessage("");
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
+    } catch (error) {
+      console.error("메시지 저장 실패:", error);
+      alert("메시지 전송에 실패했습니다. 다시 시도해주세요.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -230,16 +253,16 @@ export default function LoveWhisperWall() {
             </div>
             <button
               type="submit"
-              disabled={!message.trim()}
+              disabled={!message.trim() || isSubmitting}
               className={cn(
                 "w-full flex items-center justify-center gap-2 py-3 rounded-full font-medium transition-all duration-300",
-                message.trim()
+                message.trim() && !isSubmitting
                   ? "bg-gradient-to-r from-[#FFB8D0] to-[#FF9FBF] hover:from-[#FFA8C8] hover:to-[#FF8FB0] text-white shadow-lg hover:shadow-xl"
                   : "bg-[#FFE4EC] text-gray-400 cursor-not-allowed"
               )}
             >
               <Send className="w-4 h-4" />
-              <span>전송하기</span>
+              <span>{isSubmitting ? "전송 중..." : "전송하기"}</span>
             </button>
           </form>
         </div>

@@ -1,9 +1,16 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // TODO: 서비스 정책에 맞게 보안 규칙을 강화하세요.
-    match /{document=**} {
-      allow read, write: if false;
+    // messages 컬렉션: 누구나 읽고 쓸 수 있음 (공개 메시지 벽)
+    match /messages/{messageId} {
+      allow read: if true;
+      allow create: if request.resource.data.keys().hasAll(['message', 'createdAt', 'expiresAt'])
+                    && request.resource.data.message is string
+                    && request.resource.data.message.size() > 0
+                    && request.resource.data.message.size() <= 80
+                    && request.resource.data.createdAt is timestamp
+                    && request.resource.data.expiresAt is timestamp;
+      allow update, delete: if false; // 생성 후 수정/삭제 불가
     }
   }
 }
