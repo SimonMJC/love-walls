@@ -552,7 +552,7 @@ export default function LoveWhisperWall() {
     <div className="min-h-screen bg-white relative overflow-hidden">
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-white/70 backdrop-blur-md border-b border-[#FFE4EC]">
-        <div className="max-w-7xl mx-auto px-4 md:px-6 pt-3 pb-4 md:pt-4 md:pb-5">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 md:py-5">
           <div className="grid grid-cols-3 items-center">
             {/* Left spacer (keeps center perfectly centered) */}
             <div />
@@ -572,11 +572,11 @@ export default function LoveWhisperWall() {
               <button
                 type="button"
                 aria-label="하트 흔들기"
-                className="p-1 -m-1 rounded-full noTapHighlight focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFE4EC]"
+                className="p-2 rounded-full noTapHighlight focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFE4EC]"
                 onClick={() => setHeartWiggleKey((k) => k + 1)}
               >
                 <span key={heartWiggleKey} className="inline-block heartWiggle">
-                  <Heart className="w-5 h-5 text-[#FF9FBF] fill-[#FF9FBF]" />
+                  <Heart className="w-7 h-7 md:w-8 md:h-8 text-[#FF9FBF] fill-[#FF9FBF]" />
                 </span>
               </button>
             </div>
